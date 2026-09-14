@@ -101,7 +101,7 @@ def build(matches, players=()):
     rating, sd, wins, losses, h2h, history, results = compute(matches, players)
     players = sorted(rating, key=lambda p: (-rating[p], p))
     asof = matches[-1]["date"] if matches else date.today().isoformat()
-    out = ["# Office Table Tennis", "", f"{len(matches)} matches, {len(players)} players. Last match {asof}.", ""]
+    out = ["# ITK Melb Table Tennis", "", f"{len(matches)} matches, {len(players)} players. Last match {asof}.", ""]
 
     out += ["## Rankings", "", f"| # | Player | Rating | +- | W | L | Last {TREND_DAYS} days |", "|--:|---|--:|--:|--:|--:|--:|"]
     for i, p in enumerate(players, 1):

@@ -1,4 +1,4 @@
-# Office Table Tennis
+# ITK Melb Table Tennis
 
 4 matches, 7 players. Last match 2026-09-14.
 
