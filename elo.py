@@ -8,7 +8,7 @@ import csv, sys
 from collections import defaultdict
 from datetime import date, timedelta
 
-K, START, RECENT, TREND_DAYS = 32, 1000, 10, 7
+K, START, RECENT, TREND_DAYS = 32, 850, 10, 7
 MATCHES, README, PLAYERS = "matches.csv", "README.md", "players.txt"
 
 
