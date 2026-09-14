@@ -3,7 +3,7 @@ name: rebuild rankings
 on:
   push:
     branches: [main]
-    paths: [matches.csv, elo.py]
+    paths: [matches.csv, players.txt, elo.py, template.html]
 permissions:
   contents: write
 jobs:
@@ -15,5 +15,5 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add README.md
+          git add README.md index.html
           git diff --cached --quiet || (git commit -m "Rebuild rankings" && git push)
