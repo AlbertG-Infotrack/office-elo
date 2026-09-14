@@ -1,0 +1,19 @@
+---
+name: elo
+description: Office ELO ladder. Use when someone wants to log a match ("X beat Y", "log a game"), see rankings, who's on the rise, recent results, or head to head stats.
+---
+
+Files in repo root:
+- matches.csv - source of truth, one row per match: date,winner,loser
+- elo.py - stdlib only, rebuilds README.md from matches.csv
+- README.md - generated, never hand edit
+
+Log a match:
+1. `git pull --rebase`
+2. `python elo.py add "Winner" "Loser"` (add a YYYY-MM-DD as third arg if not today). Names must match README exactly - if elo.py prints "new player", check the spelling with the user before committing.
+3. Repeat step 2 for each extra match, then `git add matches.csv README.md && git commit -m "Winner beat Loser" && git push`
+
+Show rankings / rise / recent / h2h:
+- Run `python elo.py` and show the section asked for. Don't work out ELO yourself.
+
+Fix a wrong result: edit the row in matches.csv, run `python elo.py`, commit both files.

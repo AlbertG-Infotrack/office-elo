@@ -1,0 +1,19 @@
+# Rebuilds README.md when matches.csv is edited on GitHub directly (the skill already commits README locally).
+name: rebuild rankings
+on:
+  push:
+    branches: [main]
+    paths: [matches.csv, elo.py]
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 elo.py > /dev/null
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add README.md
+          git diff --cached --quiet || (git commit -m "Rebuild rankings" && git push)
