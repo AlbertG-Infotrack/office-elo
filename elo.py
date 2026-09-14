@@ -9,7 +9,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 K, START, RECENT, TREND_DAYS = 32, 1000, 10, 7
-MATCHES, README = "matches.csv", "README.md"
+MATCHES, README, PLAYERS = "matches.csv", "README.md", "players.txt"
 
 
 def load():
@@ -19,12 +19,19 @@ def load():
     return rows
 
 
-def compute(matches):
+def roster():
+    with open(PLAYERS, encoding="utf-8") as f:
+        return [p.strip() for p in f if p.strip()]
+
+
+def compute(matches, players=()):
     rating = defaultdict(lambda: START)
     wins, losses = defaultdict(int), defaultdict(int)
     h2h = defaultdict(int)          # (a, b) -> times a beat b
     history = defaultdict(list)     # player -> [(date, rating after)]
     results = []
+    for p in players:
+        rating[p]  # seed everyone at START so they show up with 0-0
     for m in matches:
         w, l, d = m["winner"], m["loser"], m["date"]
         expected = 1 / (1 + 10 ** ((rating[l] - rating[w]) / 400))
@@ -42,6 +49,8 @@ def compute(matches):
 
 def trend(hist, asof):
     """Rating change over the last TREND_DAYS, relative to the latest match date (deterministic)."""
+    if not hist:
+        return 0
     cutoff = (date.fromisoformat(asof) - timedelta(days=TREND_DAYS)).isoformat()
     before = START
     for d, r in hist:
@@ -50,8 +59,8 @@ def trend(hist, asof):
     return hist[-1][1] - before
 
 
-def build(matches):
-    rating, wins, losses, h2h, history, results = compute(matches)
+def build(matches, players=()):
+    rating, wins, losses, h2h, history, results = compute(matches, players)
     players = sorted(rating, key=lambda p: (-rating[p], p))
     asof = matches[-1]["date"] if matches else date.today().isoformat()
     out = ["# Office ELO", "", f"{len(matches)} matches, {len(players)} players. Last match {asof}.", ""]
@@ -82,10 +91,10 @@ def add(winner, loser, when=None):
     date.fromisoformat(when)  # raises on bad date
     if not winner.strip() or not loser.strip() or winner == loser:
         sys.exit("need two different names")
-    known = {p for m in load() for p in (m["winner"], m["loser"])}
+    known = set(roster()) | {p for m in load() for p in (m["winner"], m["loser"])}
     for p in (winner, loser):
         if p not in known:
-            print(f"note: new player '{p}' (check spelling matches README)", file=sys.stderr)
+            print(f"note: new player '{p}' - not in players.txt, check spelling", file=sys.stderr)
     with open(MATCHES, "a", newline="", encoding="utf-8") as f:
         csv.writer(f, lineterminator="\n").writerow([when, winner, loser])
 
@@ -96,7 +105,7 @@ if __name__ == "__main__":
         add(*sys.argv[2:5])
     elif len(sys.argv) > 1:
         sys.exit(__doc__)
-    md = build(load())
+    md = build(load(), roster())
     with open(README, "w", encoding="utf-8", newline="\n") as f:
         f.write(md)
     print(md)

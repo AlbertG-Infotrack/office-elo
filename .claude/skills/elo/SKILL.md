@@ -5,6 +5,7 @@ description: Office ELO ladder. Use when someone wants to log a match ("X beat Y
 
 Files in repo root:
 - matches.csv - source of truth, one row per match: date,winner,loser
+- players.txt - roster, one name per line. Add new people here first.
 - elo.py - stdlib only, rebuilds README.md from matches.csv
 - README.md - generated, never hand edit
 
