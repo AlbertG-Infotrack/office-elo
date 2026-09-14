@@ -1,13 +1,13 @@
 # ITK Melb Table Tennis
 
-5 matches, 7 players. Last match 2026-09-14.
+6 matches, 7 players. Last match 2026-09-14.
 
 ## Rankings
 
 | # | Player | Rating | +- | W | L | Last 7 days |
 |--:|---|--:|--:|--:|--:|--:|
-| 1 | Jesse | 946 | 131 | 2 | 0 | 🔥 +96 |
-| 2 | Albert | 852 | 131 | 1 | 1 | 📈 +2 |
+| 1 | Albert | 903 | 124 | 2 | 1 | 🔥 +53 |
+| 2 | Jesse | 895 | 124 | 2 | 1 | 🔥 +45 |
 | 3 | Kiren | 850 | 131 | 1 | 1 | ➖ +0 |
 | 4 | Angus | 850 | 150 | 0 | 0 | ➖ +0 |
 | 5 | Oneill | 850 | 150 | 0 | 0 | ➖ +0 |
@@ -18,12 +18,13 @@ Rating is the best estimate of strength, +- is how sure the system is (shrinks a
 
 ## On the rise
 
-Jesse (+96), Albert (+2)
+Albert (+53), Jesse (+45)
 
 ## Recent results
 
 | Date | Winner | Loser | Score | +/- |
 |---|---|---|---|--:|
+| 2026-09-14 | Albert | Jesse | 2-0 games | 51 |
 | 2026-09-14 | Kiren | Steve | 2-1 games | 51 |
 | 2026-09-14 | Albert | Artur | 11-9, 9-11, 11-5 | 53 |
 | 2026-09-14 | Jesse | Artur | 11-1, 11-6 | 45 |
@@ -34,10 +35,10 @@ Jesse (+96), Albert (+2)
 
 Row vs column, shown as wins-losses.
 
-| | Jesse | Albert | Kiren | Angus | Oneill | Artur | Steve |
+| | Albert | Jesse | Kiren | Angus | Oneill | Artur | Steve |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| Jesse | - | 1-0 | 0-0 | 0-0 | 0-0 | 1-0 | 0-0 |
-| Albert | 0-1 | - | 0-0 | 0-0 | 0-0 | 1-0 | 0-0 |
+| Albert | - | 1-1 | 0-0 | 0-0 | 0-0 | 1-0 | 0-0 |
+| Jesse | 1-1 | - | 0-0 | 0-0 | 0-0 | 1-0 | 0-0 |
 | Kiren | 0-0 | 0-0 | - | 0-0 | 0-0 | 0-1 | 1-0 |
 | Angus | 0-0 | 0-0 | 0-0 | - | 0-0 | 0-0 | 0-0 |
 | Oneill | 0-0 | 0-0 | 0-0 | 0-0 | - | 0-0 | 0-0 |
