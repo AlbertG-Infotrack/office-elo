@@ -6,22 +6,22 @@
 
 | # | Player | Rating | W | L | Last 7 days |
 |--:|---|--:|--:|--:|--:|
-| 1 | Jesse | 866 | 1 | 0 | 📈 +16 |
+| 1 | Jesse | 869 | 1 | 0 | 📈 +19 |
 | 2 | Artur | 850 | 0 | 0 | ➖ +0 |
 | 3 | Kiren | 850 | 0 | 0 | ➖ +0 |
 | 4 | Oneill | 850 | 0 | 0 | ➖ +0 |
 | 5 | Steve | 850 | 0 | 0 | ➖ +0 |
-| 6 | Albert | 834 | 0 | 1 | 📉 -16 |
+| 6 | Albert | 831 | 0 | 1 | 📉 -19 |
 
 ## On the rise
 
-Jesse (+16)
+Jesse (+19)
 
 ## Recent results
 
 | Date | Winner | Loser | Score | +/- |
 |---|---|---|---|--:|
-| 2026-09-14 | Jesse | Albert | 11-3, 11-8 | 16 |
+| 2026-09-14 | Jesse | Albert | 11-3, 11-8 | 19 |
 
 ## Head to head
 

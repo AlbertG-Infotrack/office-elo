@@ -24,6 +24,17 @@ def roster():
         return [p.strip() for p in f if p.strip()]
 
 
+def margin(score):
+    """Points-share multiplier from a score like "11-3, 11-8" (winner's points first).
+    ponytail: factor = 0.5 + winner share, so 1.0 for a coin flip, 1.5 for a whitewash. No score = 1.0."""
+    try:
+        games = [tuple(int(x) for x in g.split("-")) for g in score.split(",")]
+        w, l = sum(g[0] for g in games), sum(g[1] for g in games)
+        return 0.5 + w / (w + l)
+    except (ValueError, ZeroDivisionError, IndexError):
+        return 1.0
+
+
 def compute(matches, players=()):
     rating = defaultdict(lambda: START)
     wins, losses = defaultdict(int), defaultdict(int)
@@ -35,7 +46,7 @@ def compute(matches, players=()):
     for m in matches:
         w, l, d = m["winner"], m["loser"], m["date"]
         expected = 1 / (1 + 10 ** ((rating[l] - rating[w]) / 400))
-        delta = round(K * (1 - expected))
+        delta = round(K * (1 - expected) * margin(m.get("score") or ""))
         rating[w] += delta
         rating[l] -= delta
         wins[w] += 1
