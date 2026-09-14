@@ -7,7 +7,7 @@ Files in repo root:
 - matches.csv - source of truth, one row per match: date,winner,loser,score (score optional, winner's points first, like "11-3, 11-8"). Score is recorded only - ratings use match win/loss (Ratings Central style, mean +- SD). Still ask for the score, people like seeing it.
 - players.txt - roster, one name per line. Add new people here first.
 - elo.py - stdlib only, rebuilds README.md from matches.csv
-- README.md - generated, never hand edit
+- README.md and index.html - generated, never hand edit. template.html is the styling for the GitHub Pages site.
 
 Log a match:
 1. `git pull --rebase`

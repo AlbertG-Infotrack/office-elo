@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office Table Tennis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f17; --card: #121a27; --line: #1f2a3b; --text: #e6ebf3; --muted: #8b97ab;
+    --accent: #ff7a1a; --accent2: #ffb347; --up: #3ddc84; --down: #ff5c6c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #1a2440 0%, var(--bg) 60%);
+    color: var(--text); font: 15px/1.5 Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+    padding: 32px 16px 64px; min-height: 100vh;
+  }
+  main { max-width: 960px; margin: 0 auto; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
+  h1 { margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -0.02em; }
+  h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .meta { color: var(--muted); font-size: 14px; }
+  h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0 0 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } h1 { font-size: 28px; } }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 0 10px 10px; }
+  td { padding: 12px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rank { color: var(--muted); font-weight: 600; width: 36px; }
+  .rank.r1 { color: #ffd166; } .rank.r2 { color: #c0c8d6; } .rank.r3 { color: #d69a6a; }
+  .player { font-weight: 600; }
+  .rating { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .sd { color: var(--muted); font-size: 12px; margin-left: 4px; }
+  .bar { height: 4px; background: var(--line); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; }
+  .wl { color: var(--muted); white-space: nowrap; }
+  .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .up { background: rgba(61,220,132,.12); color: var(--up); } .down { background: rgba(255,92,108,.12); color: var(--down); }
+  .flat { background: rgba(139,151,171,.12); color: var(--muted); }
+  .rising { display: flex; flex-wrap: wrap; gap: 8px; }
+  .rising .chip { font-size: 14px; padding: 6px 12px; }
+
+  .results li { list-style: none; display: grid; grid-template-columns: 78px 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .results li:first-child { border-top: 0; }
+  .results ul { margin: 0; padding: 0; }
+  .date { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .score { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .beat { color: var(--muted); }
+
+  .h2h { overflow-x: auto; }
+  .h2h td, .h2h th { text-align: center; padding: 8px 6px; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .h2h th:first-child, .h2h td:first-child { text-align: left; font-weight: 600; }
+  .h2h .win { color: var(--up); } .h2h .loss { color: var(--down); } .h2h .none { color: var(--line); }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 32px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Office <span>Table Tennis</span></h1>
+    <div class="meta">$meta</div>
+  </header>
+
+  <section class="card">
+    <h2>Rankings</h2>
+    <table>
+      <thead><tr><th></th><th>Player</th><th class="num">Rating</th><th>Record</th><th class="num">Last $trend_days days</th></tr></thead>
+      <tbody>$rankings</tbody>
+    </table>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>On the rise</h2>
+      <div class="rising">$rising</div>
+    </section>
+    <section class="card results">
+      <h2>Recent results</h2>
+      <ul>$recent</ul>
+    </section>
+  </div>
+
+  <section class="card h2h">
+    <h2>Head to head</h2>
+    <table>
+      <thead><tr><th></th>$h2h_head</tr></thead>
+      <tbody>$h2h</tbody>
+    </table>
+  </section>
+
+  <footer>Ratings Central style mean &plusmn; SD model. Rating is the best estimate of strength, &plusmn; is how sure the system is. <a href="$repo">Source and match log</a></footer>
+</main>
+</body>
+</html>

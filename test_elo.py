@@ -1,5 +1,5 @@
 # ponytail: one check that fails if the rating maths, decay or h2h breaks. run: python test_elo.py
-from elo import compute, build, update, widen, win_prob, START, START_SD
+from elo import compute, build, page, update, widen, win_prob, START, START_SD
 
 # equal players: 50/50, winner gains what loser drops, both get more certain
 assert abs(win_prob(START, START_SD, START) - 0.5) < 1e-9
@@ -16,4 +16,6 @@ rating, sd, wins, losses, h2h, history, results = compute(ms)
 assert rating["A"] > rating["B"] and (wins["A"], losses["A"], h2h[("A", "B")], h2h[("B", "A")]) == (2, 1, 2, 1)
 md = build(ms)
 assert "| 1 | A |" in md and "| A | - | 2-1 |" in md and "A (+" in md and "11-9, 11-9" in md
+h = page(ms)
+assert '<td class="player">A</td>' in h and "2-1" in h and "11-9, 11-9" in h and "$" not in h.split("<main>")[1]
 print("ok")

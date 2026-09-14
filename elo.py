@@ -10,14 +10,15 @@ system is confident. SD shrinks with every match and widens by a 70-points-per-y
 don't play. Only who won the match counts - the score is recorded but not used, same as Ratings Central.
 The Bayesian update itself is Glicko's closed form (Ratings Central doesn't publish its upset function).
 """
-import csv, math, sys
+import csv, html, math, string, sys
 from collections import defaultdict
 from datetime import date
 
 START, START_SD, RECENT, TREND_DAYS = 850, 150, 10, 7
 DRIFT = 70  # SD variance grows by DRIFT^2 per year of not playing (Ratings Central's figure)
 Q = math.log(10) / 400
-MATCHES, README, PLAYERS = "matches.csv", "README.md", "players.txt"
+MATCHES, README, PLAYERS, TEMPLATE, INDEX = "matches.csv", "README.md", "players.txt", "template.html", "index.html"
+REPO = "https://github.com/AlbertG-Infotrack/office-elo"
 
 
 def load():
@@ -124,6 +125,51 @@ def build(matches, players=()):
     return "\n".join(out) + "\n"
 
 
+def chip(t):
+    cls = "up" if t > 0 else "down" if t < 0 else "flat"
+    return f'<span class="chip {cls}">{t:+d}</span>'
+
+
+def page(matches, players=()):
+    """Fill template.html with the same data as the README."""
+    rating, sd, wins, losses, h2h, history, results = compute(matches, players)
+    players = sorted(rating, key=lambda p: (-rating[p], p))
+    asof = matches[-1]["date"] if matches else date.today().isoformat()
+    e = html.escape
+    lo, hi = (min(rating.values()), max(rating.values())) if rating else (START, START)
+    rows = []
+    for i, p in enumerate(players, 1):
+        pct = 15 + 85 * (rating[p] - lo) / (hi - lo) if hi > lo else 50
+        rows.append(
+            f'<tr><td class="rank r{i}">{i}</td><td class="player">{e(p)}</td>'
+            f'<td class="num"><span class="rating">{round(rating[p])}</span><span class="sd">&plusmn;{round(sd[p])}</span>'
+            f'<div class="bar"><i style="width:{pct:.0f}%"></i></div></td>'
+            f'<td class="wl">{wins[p]}W {losses[p]}L</td><td class="num">{chip(trend(history[p], asof))}</td></tr>')
+    movers = sorted(((trend(history[p], asof), p) for p in players), reverse=True)
+    rising = [f'<span class="chip up">{e(p)} {t:+d}</span>' for t, p in movers if t > 0][:3]
+    recent = [f'<li><span class="date">{d}</span><span><b>{e(w)}</b> <span class="beat">beat</span> {e(l)}</span>'
+              f'<span class="score">{e(score)}</span>{chip(delta)}</li>'
+              for d, w, l, delta, score in reversed(results[-RECENT:])]
+    head = "".join(f"<th>{e(q)}</th>" for q in players)
+    grid = []
+    for p in players:
+        cells = []
+        for q in players:
+            if p == q:
+                cells.append('<td class="none">&middot;</td>')
+            else:
+                a, b = h2h.get((p, q), 0), h2h.get((q, p), 0)
+                cls = "win" if a > b else "loss" if b > a else "none" if a == b == 0 else ""
+                cells.append(f'<td class="{cls}">{a}-{b}</td>')
+        grid.append(f"<tr><td>{e(p)}</td>{''.join(cells)}</tr>")
+    tpl = string.Template(open(TEMPLATE, encoding="utf-8").read())
+    return tpl.substitute(
+        meta=f"{len(matches)} matches &middot; {len(players)} players &middot; last match {asof}",
+        trend_days=TREND_DAYS, rankings="".join(rows), rising="".join(rising) or '<span class="meta">Nobody yet.</span>',
+        recent="".join(recent) or '<li><span class="meta">No matches yet.</span></li>',
+        h2h_head=head, h2h="".join(grid), repo=REPO)
+
+
 def add(winner, loser, *rest):
     when = next((a for a in rest if a[:4].isdigit() and "-" in a[4:5]), date.today().isoformat())
     score = next((a for a in rest if a != when), "")
@@ -147,4 +193,6 @@ if __name__ == "__main__":
     md = build(load(), roster())
     with open(README, "w", encoding="utf-8", newline="\n") as f:
         f.write(md)
+    with open(INDEX, "w", encoding="utf-8", newline="\n") as f:
+        f.write(page(load(), roster()))
     print(md)
