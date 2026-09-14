@@ -2,7 +2,7 @@
 """Office ELO. matches.csv is the source of truth, README.md is generated.
 
   python elo.py                       rebuild README.md and print it
-  python elo.py add WINNER LOSER [YYYY-MM-DD]   log a match, then rebuild
+  python elo.py add WINNER LOSER [YYYY-MM-DD] [SCORE]   log a match, then rebuild (score like "11-3, 11-8")
 """
 import csv, sys
 from collections import defaultdict
@@ -43,7 +43,7 @@ def compute(matches, players=()):
         h2h[(w, l)] += 1
         history[w].append((d, rating[w]))
         history[l].append((d, rating[l]))
-        results.append((d, w, l, delta))
+        results.append((d, w, l, delta, m.get("score") or ""))
     return rating, wins, losses, h2h, history, results
 
 
@@ -75,8 +75,8 @@ def build(matches, players=()):
     rising = [f"{p} ({t:+d})" for t, p in movers if t > 0][:3]
     out += ["", "## On the rise", "", ", ".join(rising) or "Nobody yet."]
 
-    out += ["", "## Recent results", "", "| Date | Winner | Loser | +/- |", "|---|---|---|--:|"]
-    out += [f"| {d} | {w} | {l} | {delta} |" for d, w, l, delta in reversed(results[-RECENT:])]
+    out += ["", "## Recent results", "", "| Date | Winner | Loser | Score | +/- |", "|---|---|---|---|--:|"]
+    out += [f"| {d} | {w} | {l} | {score} | {delta} |" for d, w, l, delta, score in reversed(results[-RECENT:])]
 
     out += ["", "## Head to head", "", "Row vs column, shown as wins-losses.", ""]
     out += ["| | " + " | ".join(players) + " |", "|---|" + "--:|" * len(players)]
@@ -86,8 +86,9 @@ def build(matches, players=()):
     return "\n".join(out) + "\n"
 
 
-def add(winner, loser, when=None):
-    when = when or date.today().isoformat()
+def add(winner, loser, *rest):
+    when = next((a for a in rest if a[:4].isdigit() and "-" in a[4:5]), date.today().isoformat())
+    score = next((a for a in rest if a != when), "")
     date.fromisoformat(when)  # raises on bad date
     if not winner.strip() or not loser.strip() or winner == loser:
         sys.exit("need two different names")
@@ -96,13 +97,13 @@ def add(winner, loser, when=None):
         if p not in known:
             print(f"note: new player '{p}' - not in players.txt, check spelling", file=sys.stderr)
     with open(MATCHES, "a", newline="", encoding="utf-8") as f:
-        csv.writer(f, lineterminator="\n").writerow([when, winner, loser])
+        csv.writer(f, lineterminator="\n").writerow([when, winner, loser, score])
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")  # windows console
     if len(sys.argv) > 1 and sys.argv[1] == "add":
-        add(*sys.argv[2:5])
+        add(*sys.argv[2:6])
     elif len(sys.argv) > 1:
         sys.exit(__doc__)
     md = build(load(), roster())
