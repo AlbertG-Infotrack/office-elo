@@ -1,6 +1,6 @@
 # Office Table Tennis
 
-3 matches, 6 players. Last match 2026-09-14.
+3 matches, 7 players. Last match 2026-09-14.
 
 ## Rankings
 
@@ -8,10 +8,11 @@
 |--:|---|--:|--:|--:|--:|--:|
 | 1 | Jesse | 946 | 131 | 2 | 0 | 🔥 +96 |
 | 2 | Artur | 855 | 131 | 1 | 1 | 📈 +5 |
-| 3 | Oneill | 850 | 150 | 0 | 0 | ➖ +0 |
-| 4 | Steve | 850 | 150 | 0 | 0 | ➖ +0 |
-| 5 | Albert | 799 | 140 | 0 | 1 | 📉 -51 |
-| 6 | Kiren | 799 | 140 | 0 | 1 | 📉 -51 |
+| 3 | Angus | 850 | 150 | 0 | 0 | ➖ +0 |
+| 4 | Oneill | 850 | 150 | 0 | 0 | ➖ +0 |
+| 5 | Steve | 850 | 150 | 0 | 0 | ➖ +0 |
+| 6 | Albert | 799 | 140 | 0 | 1 | 📉 -51 |
+| 7 | Kiren | 799 | 140 | 0 | 1 | 📉 -51 |
 
 Rating is the best estimate of strength, +- is how sure the system is (shrinks as you play).
 
@@ -31,11 +32,12 @@ Jesse (+96), Artur (+5)
 
 Row vs column, shown as wins-losses.
 
-| | Jesse | Artur | Oneill | Steve | Albert | Kiren |
-|---|--:|--:|--:|--:|--:|--:|
-| Jesse | - | 1-0 | 0-0 | 0-0 | 1-0 | 0-0 |
-| Artur | 0-1 | - | 0-0 | 0-0 | 0-0 | 1-0 |
-| Oneill | 0-0 | 0-0 | - | 0-0 | 0-0 | 0-0 |
-| Steve | 0-0 | 0-0 | 0-0 | - | 0-0 | 0-0 |
-| Albert | 0-1 | 0-0 | 0-0 | 0-0 | - | 0-0 |
-| Kiren | 0-0 | 0-1 | 0-0 | 0-0 | 0-0 | - |
+| | Jesse | Artur | Angus | Oneill | Steve | Albert | Kiren |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| Jesse | - | 1-0 | 0-0 | 0-0 | 0-0 | 1-0 | 0-0 |
+| Artur | 0-1 | - | 0-0 | 0-0 | 0-0 | 0-0 | 1-0 |
+| Angus | 0-0 | 0-0 | - | 0-0 | 0-0 | 0-0 | 0-0 |
+| Oneill | 0-0 | 0-0 | 0-0 | - | 0-0 | 0-0 | 0-0 |
+| Steve | 0-0 | 0-0 | 0-0 | 0-0 | - | 0-0 | 0-0 |
+| Albert | 0-1 | 0-0 | 0-0 | 0-0 | 0-0 | - | 0-0 |
+| Kiren | 0-0 | 0-1 | 0-0 | 0-0 | 0-0 | 0-0 | - |
