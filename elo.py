@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
-"""Office ELO. matches.csv is the source of truth, README.md is generated.
+"""Office table tennis ratings. matches.csv is the source of truth, README.md is generated.
 
-  python elo.py                       rebuild README.md and print it
-  python elo.py add WINNER LOSER [YYYY-MM-DD] [SCORE]   log a match, then rebuild (score like "11-3, 11-8")
+  python elo.py                                 rebuild README.md and print it
+  python elo.py add WINNER LOSER [YYYY-MM-DD] [SCORE]   log a match, then rebuild
+
+Rating model follows Ratings Central (ratingscentral.com/HowItWorks.php): each player is a normal
+distribution, mean +- SD. Wins move you by more when your SD is high (new or rusty) and less once the
+system is confident. SD shrinks with every match and widens by a 70-points-per-year random walk when you
+don't play. Only who won the match counts - the score is recorded but not used, same as Ratings Central.
+The Bayesian update itself is Glicko's closed form (Ratings Central doesn't publish its upset function).
 """
-import csv, sys
+import csv, math, sys
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date
 
-K, START, RECENT, TREND_DAYS = 32, 850, 10, 7
+START, START_SD, RECENT, TREND_DAYS = 850, 150, 10, 7
+DRIFT = 70  # SD variance grows by DRIFT^2 per year of not playing (Ratings Central's figure)
+Q = math.log(10) / 400
 MATCHES, README, PLAYERS = "matches.csv", "README.md", "players.txt"
 
 
@@ -24,67 +32,86 @@ def roster():
         return [p.strip() for p in f if p.strip()]
 
 
-def margin(score):
-    """Points-share multiplier from a score like "11-3, 11-8" (winner's points first).
-    ponytail: factor = 0.5 + winner share, so 1.0 for a coin flip, 1.5 for a whitewash. No score = 1.0."""
-    try:
-        games = [tuple(int(x) for x in g.split("-")) for g in score.split(",")]
-        w, l = sum(g[0] for g in games), sum(g[1] for g in games)
-        return 0.5 + w / (w + l)
-    except (ValueError, ZeroDivisionError, IndexError):
-        return 1.0
+def g(sd):
+    return 1 / math.sqrt(1 + 3 * Q * Q * sd * sd / math.pi ** 2)
+
+
+def win_prob(r, sd_other, r_other):
+    return 1 / (1 + 10 ** (-g(sd_other) * (r - r_other) / 400))
+
+
+def widen(sd, days):
+    return math.sqrt(sd * sd + DRIFT * DRIFT * days / 365)
+
+
+def update(r, sd, r_other, sd_other, won):
+    """Glicko posterior for one match. Returns new (mean, sd)."""
+    gj, e = g(sd_other), win_prob(r, sd_other, r_other)
+    d2 = 1 / (Q * Q * gj * gj * e * (1 - e))
+    prec = 1 / (sd * sd) + 1 / d2
+    return r + Q / prec * gj * (won - e), math.sqrt(1 / prec)
 
 
 def compute(matches, players=()):
     rating = defaultdict(lambda: START)
+    sd = defaultdict(lambda: START_SD)
+    last = {}
     wins, losses = defaultdict(int), defaultdict(int)
     h2h = defaultdict(int)          # (a, b) -> times a beat b
     history = defaultdict(list)     # player -> [(date, rating after)]
     results = []
     for p in players:
-        rating[p]  # seed everyone at START so they show up with 0-0
+        rating[p]  # seed everyone so they show up with 0-0
     for m in matches:
         w, l, d = m["winner"], m["loser"], m["date"]
-        expected = 1 / (1 + 10 ** ((rating[l] - rating[w]) / 400))
-        delta = round(K * (1 - expected) * margin(m.get("score") or ""))
-        rating[w] += delta
-        rating[l] -= delta
+        day = date.fromisoformat(d)
+        for p in (w, l):
+            if p in last:
+                sd[p] = widen(sd[p], (day - last[p]).days)
+            last[p] = day
+        # ponytail: both updated from each other's pre-match law. Ratings Central's "adjusted laws"
+        # loop only matters when a whole event is rated at once; we rate one match at a time.
+        new_w = update(rating[w], sd[w], rating[l], sd[l], 1)
+        new_l = update(rating[l], sd[l], rating[w], sd[w], 0)
+        delta = round(new_w[0]) - round(rating[w])
+        (rating[w], sd[w]), (rating[l], sd[l]) = new_w, new_l
         wins[w] += 1
         losses[l] += 1
         h2h[(w, l)] += 1
-        history[w].append((d, rating[w]))
-        history[l].append((d, rating[l]))
+        history[w].append((d, round(rating[w])))
+        history[l].append((d, round(rating[l])))
         results.append((d, w, l, delta, m.get("score") or ""))
-    return rating, wins, losses, h2h, history, results
+    return rating, sd, wins, losses, h2h, history, results
 
 
 def trend(hist, asof):
     """Rating change over the last TREND_DAYS, relative to the latest match date (deterministic)."""
     if not hist:
         return 0
-    cutoff = (date.fromisoformat(asof) - timedelta(days=TREND_DAYS)).isoformat()
+    cutoff = date.fromisoformat(asof).toordinal() - TREND_DAYS
     before = START
     for d, r in hist:
-        if d < cutoff:
+        if date.fromisoformat(d).toordinal() < cutoff:
             before = r
     return hist[-1][1] - before
 
 
 def build(matches, players=()):
-    rating, wins, losses, h2h, history, results = compute(matches, players)
+    rating, sd, wins, losses, h2h, history, results = compute(matches, players)
     players = sorted(rating, key=lambda p: (-rating[p], p))
     asof = matches[-1]["date"] if matches else date.today().isoformat()
-    out = ["# Office ELO", "", f"{len(matches)} matches, {len(players)} players. Last match {asof}.", ""]
+    out = ["# Office Table Tennis", "", f"{len(matches)} matches, {len(players)} players. Last match {asof}.", ""]
 
-    out += ["## Rankings", "", f"| # | Player | Rating | W | L | Last {TREND_DAYS} days |", "|--:|---|--:|--:|--:|--:|"]
+    out += ["## Rankings", "", f"| # | Player | Rating | +- | W | L | Last {TREND_DAYS} days |", "|--:|---|--:|--:|--:|--:|--:|"]
     for i, p in enumerate(players, 1):
         t = trend(history[p], asof)
         icon = "🔥" if t >= 30 else "📈" if t > 0 else "📉" if t < 0 else "➖"
-        out.append(f"| {i} | {p} | {rating[p]} | {wins[p]} | {losses[p]} | {icon} {t:+d} |")
+        out.append(f"| {i} | {p} | {round(rating[p])} | {round(sd[p])} | {wins[p]} | {losses[p]} | {icon} {t:+d} |")
+    out += ["", "Rating is the best estimate of strength, +- is how sure the system is (shrinks as you play).", ""]
 
     movers = sorted(((trend(history[p], asof), p) for p in players), reverse=True)
     rising = [f"{p} ({t:+d})" for t, p in movers if t > 0][:3]
-    out += ["", "## On the rise", "", ", ".join(rising) or "Nobody yet."]
+    out += ["## On the rise", "", ", ".join(rising) or "Nobody yet."]
 
     out += ["", "## Recent results", "", "| Date | Winner | Loser | Score | +/- |", "|---|---|---|---|--:|"]
     out += [f"| {d} | {w} | {l} | {score} | {delta} |" for d, w, l, delta, score in reversed(results[-RECENT:])]
